@@ -34,6 +34,7 @@ linters:
     - nakedret
     - prealloc
     - scopelint
+    - lll
   fast: false
 
 linters-settings:
