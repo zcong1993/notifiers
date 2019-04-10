@@ -45,6 +45,11 @@ var msgTpl = template.Must(template.New("ding").Parse(`
 
 {{ .Content }}
 
+
+{{ if gt (len .URL) 0 }}
+URL: [{{ .URL }}]({{ .URL }})
+{{ end }}
+
 {{ if gt (len .Tags) 0 }}
 {{ range $tag := .Tags }}
 - {{ $tag }}
