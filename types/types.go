@@ -20,6 +20,7 @@ type Message struct {
 // Notifier is notifier interface
 type Notifier interface {
 	Notify(msg *Message) error
+	GetName() string
 }
 
 func WrapMsg(msg *Message) *Message {

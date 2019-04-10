@@ -87,6 +87,10 @@ func (dc *Client) Notify(msg *types.Message) error {
 	return nil
 }
 
+func (dc *Client) GetName() string {
+	return "ding"
+}
+
 func buildMsg(msg *types.Message) (*RequestMsg, error) {
 	var res bytes.Buffer
 	err := msgTpl.Execute(&res, msg)
