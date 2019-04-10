@@ -136,8 +136,7 @@ var msgTpl = template.Must(template.New("mail").Parse(`
   <body class="body" style="margin: 0; width: 100%;">
     <table class="bodyTable" role="presentation" width="100%" align="left" border="0" cellpadding="0" cellspacing="0" style="width: 100%; margin: 0;">
       <tr>
-        <td class="body__content" align="left" width="100%" valign="top" style="color: #000000; font-family: Helvetica,Arial,sans-serif; font-size: 16px; line-height: 20px;">
-          <p class="text p" style="display: block; margin: 14px 0; color: #000000; font-family: Helvetica,Arial,sans-serif; font-size: 16px; line-height: 20px;">{{ .Content }}</p> {{ if .URL }}
+        <td class="body__content" align="left" width="100%" valign="top" style="color: #000000; font-family: Helvetica,Arial,sans-serif; font-size: 16px; line-height: 20px;"> {{ .Content }} {{ if .URL }}
           <div class="secondary-button button" style="background-color: #6495ED;">
             <table role="presentation" width="100%" align="left" border="0" cellpadding="0" cellspacing="0">
               <tr>
