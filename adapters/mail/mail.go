@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"html/template"
+	"text/template"
 	"time"
 
 	"github.com/mailgun/mailgun-go/v3"
@@ -117,6 +117,205 @@ var msgTpl = template.Must(template.New("mail").Parse(`
       .ExternalClass div {
         line-height: 100%;
       }
+      .markdown {
+        word-wrap: break-word;
+      }
+      .markdown,
+      .markdown h1,
+      .markdown h2,
+      .markdown h3,
+      .markdown h4,
+      .markdown h5,
+      .markdown h6,
+      .markdown pre,
+      .markdown code,
+      .markdown blockquote,
+      .markdown em,
+      .markdown strong,
+      .markdown code {
+        font-size: 14px;
+        line-height: 20px;
+        font-weight: normal;
+        font-style: normal;
+        font-family: consolas, monaco, courier, "courier new", monospace;
+        color: #333333;
+      }
+      .markdown h1,
+      .markdown h2,
+      .markdown h3,
+      .markdown h4,
+      .markdown h5,
+      .markdown h6,
+      .markdown pre,
+      .markdown code,
+      .markdown blockquote,
+      .markdown ol,
+      .markdown ul,
+      .markdown li,
+      .markdown p,
+      .markdown section,
+      .markdown header,
+      .markdown footer {
+        float: none;
+        margin: 0;
+        padding: 0;
+      }
+      .markdown h1,
+      .markdown p,
+      .markdown ul,
+      .markdown ol,
+      .markdown pre,
+      .markdown blockquote {
+        margin-top: 20px;
+        margin-bottom: 20px;
+      }
+      .markdown h1 {
+        position: relative;
+        display: inline-block;
+        display: table-cell;
+        padding: 20px 0 40px;
+        margin: 0;
+        overflow: hidden;
+      }
+      .markdown h1:after {
+        content: "====================================================================================================";
+        position: absolute;
+        bottom: 20px;
+        left: 0;
+      }
+      .markdown h1 + * {
+        margin-top: 0;
+      }
+      .markdown h2,
+      .markdown h3,
+      .markdown h4,
+      .markdown h5,
+      .markdown h6 {
+        position: relative;
+        margin-bottom: 20px;
+      }
+      .markdown h2:before,
+      .markdown h3:before,
+      .markdown h4:before,
+      .markdown h5:before,
+      .markdown h6:before {
+        content: "## ";
+        display: inline;
+      }
+      .markdown h3:before {
+        content: "### ";
+      }
+      .markdown h4:before {
+        content: "#### ";
+      }
+      .markdown h5:before {
+        content: "##### ";
+      }
+      .markdown h6:before {
+        content: "###### ";
+      }
+      .markdown li {
+        position: relative;
+        display: block;
+        padding-left: 34px;
+        padding-left: 4ch;
+      }
+      .markdown li:after {
+        position: absolute;
+        top: 0;
+        left: 0;
+      }
+      .markdown ul > li:after {
+        content: "*";
+      }
+      .markdown ol {
+        counter-reset: ol;
+      }
+      .markdown ol > li:after {
+        content: counter(ol) ".";
+        counter-increment: ol;
+      }
+      .markdown pre {
+        margin-left: 34px;
+        margin-left: 4ch;
+      }
+      .markdown blockquote {
+        position: relative;
+        padding-left: 17px;
+        padding-left: 2ch;
+        overflow: hidden;
+      }
+      .markdown blockquote:after {
+        content: ">\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>";
+        white-space: pre;
+        position: absolute;
+        top: 0;
+        left: 0;
+        font-size: 14px;
+        line-height: 20px;
+      }
+      .markdown strong:before,
+      .markdown strong:after {
+        content: "__";
+        display: inline;
+      }
+      .markdown em:before,
+      .markdown em:after {
+        content: "*";
+        display: inline;
+      }
+      .markdown a {
+        text-decoration: none;
+      }
+      .markdown a:before {
+        content: "[";
+        display: inline;
+        color: #333333;
+      }
+      .markdown a:after {
+        content: "](" attr(href) ")";
+        display: inline;
+        color: #333333;
+      }
+      .markdown code {
+        font-weight: 100;
+      }
+      .markdown code:before,
+      .markdown code:after {
+        content: "` + "`" + `";
+        display: inline;
+      }
+      .markdown pre code:before,
+      .markdown pre code:after {
+        content: none;
+      }
+      .markdown hr {
+        position: relative;
+        height: 20px;
+        font-size: 0;
+        line-height: 0;
+        overflow: hidden;
+        border: 0;
+        margin-bottom: 20px;
+      }
+      .markdown hr:after {
+        content: "----------------------------------------------------------------------------------------------------";
+        position: absolute;
+        top: 0;
+        left: 0;
+        font-size: 14px;
+        line-height: 20px;
+        width: 100%;
+        word-wrap: break-word;
+      }
+      @-moz-document url-prefix() {
+        .markdown h1 {
+          display: block;
+        }
+      }
+      .markdown-ones ol > li:after {
+        content: "1.";
+      }
     </style>
     <!--[if gte mso 9]>
       <style type="text/css">
@@ -124,7 +323,7 @@ var msgTpl = template.Must(template.New("mail").Parse(`
       table td { border-collapse: collapse; }
       </style>
       <![endif]-->
-    <title>{{ .Title }}</title>
+    <title>Welcome to HEML!</title>
     <!-- content -->
     <!--[if gte mso 9]><xml>
        <o:OfficeDocumentSettings>
@@ -136,23 +335,22 @@ var msgTpl = template.Must(template.New("mail").Parse(`
   <body class="body" style="margin: 0; width: 100%;">
     <table class="bodyTable" role="presentation" width="100%" align="left" border="0" cellpadding="0" cellspacing="0" style="width: 100%; margin: 0;">
       <tr>
-        <td class="body__content" align="left" width="100%" valign="top" style="color: #000000; font-family: Helvetica,Arial,sans-serif; font-size: 16px; line-height: 20px;"> {{ .Content }} {{ if .URL }}
-          <div class="secondary-button button" style="background-color: #6495ED;">
-            <table role="presentation" width="100%" align="left" border="0" cellpadding="0" cellspacing="0">
+        <td class="body__content" align="left" width="100%" valign="top" style="color: #000000; font-family: Helvetica,Arial,sans-serif; font-size: 16px; line-height: 20px;">
+          <div class="markdown container" style="margin: 0 auto; max-width: 600px; width: 100%; word-wrap: break-word; color: #333333; font-family: consolas,monaco,courier,'courier new',monospace; font-size: 14px; font-style: normal; font-weight: 400; line-height: 20px;">
+          <!--[if mso | IE]>
+            <table class="container__table__ie" role="presentation" border="0" cellpadding="0" cellspacing="0" style="margin-right: auto; margin-left: auto;width: 600px" width="600" align="center">
               <tr>
-                <td>
-                  <table role="presentation" width="auto" align="center" border="0" cellspacing="0" cellpadding="0" class="button__table" style="margin: 0 auto;">
-                    <tr>
-                      <td align="center" class="button__cell" style="border-radius: 3px; padding: 6px 12px; background-color: #6495ED;" bgcolor="#6495ED"><a href="{{ .URL }}" class="button__link" style="color: #FFFFFF; text-decoration: none; background-color: #6495ED; display: inline-block;"><span class="button__text" style="color: #FFFFFF; text-decoration: none;">阅读全文</span></a></td>
+                <td> <![endif]-->
+                  <table class="container__table" role="presentation" border="0" align="center" cellpadding="0" cellspacing="0" width="100%">
+                    <tr class="container__row">
+                      <td class="container__cell" width="100%" align="left" valign="top"> {{ .Content }} {{ if .URL }} <a href="{{ .URL }}" class="a" style="text-decoration: none;"><span class="a__text" style="text-decoration: none;">{{ .URL }}</span></a> {{ end }} </td>
                     </tr>
-                  </table>
-                </td>
+                  </table> <!--[if mso | IE]> </td>
               </tr>
-            </table>
-          </div> {{ end }} </td>
+            </table> <![endif]--> </div>
+        </td>
       </tr>
     </table>
     <div style="display:none; white-space:nowrap; font-size:15px; line-height:0;">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </div>
   </body>
-</html>
-`))
+</html>`))
