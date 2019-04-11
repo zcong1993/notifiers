@@ -3,8 +3,10 @@ package ding
 import (
 	"bytes"
 	"errors"
-	"html/template"
 	"net/http"
+	"text/template"
+
+	"github.com/lunny/html2md"
 
 	"github.com/imroc/req"
 	"github.com/zcong1993/notifiers/types"
@@ -97,6 +99,7 @@ func (dc *Client) GetName() string {
 }
 
 func buildMsg(msg *types.Message) (*RequestMsg, error) {
+	msg.Content = html2md.Convert(msg.Content)
 	var res bytes.Buffer
 	err := msgTpl.Execute(&res, msg)
 	if err != nil {
