@@ -23,6 +23,7 @@ type Notifier interface {
 	GetName() string
 }
 
+// WrapMsg add uuid and timestamp to msg
 func WrapMsg(msg *Message) *Message {
 	if msg.ID == "" {
 		msg.ID = uuid.New().String()
@@ -33,4 +34,17 @@ func WrapMsg(msg *Message) *Message {
 	}
 
 	return msg
+}
+
+// Clone clone a new message
+func (msg *Message) Clone() *Message {
+	return &Message{
+		ID:      msg.ID,
+		Title:   msg.Title,
+		Tags:    msg.Tags,
+		Content: msg.Content,
+		URL:     msg.URL,
+		Time:    msg.Time,
+		Exts:    msg.Exts,
+	}
 }
