@@ -1,6 +1,7 @@
 package types
 
 import (
+	"context"
 	"time"
 
 	"github.com/google/uuid"
@@ -19,8 +20,9 @@ type Message struct {
 
 // Notifier is notifier interface
 type Notifier interface {
-	Notify(msg *Message) error
+	Notify(ctx context.Context, msg *Message) error
 	GetName() string
+	Close() error
 }
 
 // WrapMsg add uuid and timestamp to msg

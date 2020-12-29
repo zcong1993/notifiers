@@ -2,9 +2,14 @@ package ding
 
 import (
 	"bytes"
-	"errors"
+	"context"
 	"net/http"
 	"text/template"
+
+	"github.com/go-kit/kit/log"
+	"github.com/go-kit/kit/log/level"
+
+	"github.com/pkg/errors"
 
 	"github.com/lunny/html2md"
 
@@ -18,6 +23,7 @@ const endPoint = "https://oapi.dingtalk.com/robot/send?access_token="
 type Client struct {
 	token      string
 	httpClient *req.Req
+	logger     log.Logger
 }
 
 // ActionCard is ding talk msg sub struct
@@ -64,6 +70,7 @@ func NewClient(token string) *Client {
 	client := &Client{
 		token:      token,
 		httpClient: req.New(),
+		logger:     log.NewNopLogger(),
 	}
 	return client
 }
@@ -73,29 +80,39 @@ func (dc *Client) SetHTTPClient(hc *http.Client) {
 	dc.httpClient.SetClient(hc)
 }
 
+// SetLogger can replace logger
+func (dc *Client) SetLogger(logger log.Logger) {
+	dc.logger = logger
+}
+
 // Notify impl notifier's notify method
-func (dc *Client) Notify(msg *types.Message) error {
+func (dc *Client) Notify(ctx context.Context, msg *types.Message) error {
 	dingMsg, err := buildMsg(msg)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "build msg")
 	}
-	res, err := dc.httpClient.Post(endPoint+dc.token, req.BodyJSON(dingMsg))
+	res, err := dc.httpClient.Post(endPoint+dc.token, req.BodyJSON(dingMsg), ctx)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "request")
 	}
 	var resp Resp
 	err = res.ToJSON(&resp)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "decode response")
 	}
 	if resp.ErrCode != 0 {
 		return errors.New(resp.ErrMsg)
 	}
+	level.Info(dc.logger).Log("msg", "send success")
 	return nil
 }
 
 func (dc *Client) GetName() string {
 	return "ding"
+}
+
+func (dc *Client) Close() error {
+	return nil
 }
 
 func buildMsg(msg *types.Message) (*RequestMsg, error) {
@@ -118,3 +135,5 @@ func buildMsg(msg *types.Message) (*RequestMsg, error) {
 		},
 	}, nil
 }
+
+var _ types.Notifier = (*Client)(nil)

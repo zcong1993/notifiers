@@ -7,6 +7,11 @@ import (
 	"text/template"
 	"time"
 
+	"github.com/go-kit/kit/log"
+	"github.com/go-kit/kit/log/level"
+
+	"github.com/pkg/errors"
+
 	"github.com/mailgun/mailgun-go/v3"
 	"github.com/zcong1993/notifiers/types"
 )
@@ -18,6 +23,7 @@ type Client struct {
 	mg         mailgun.Mailgun
 	recipient  string
 	from       string
+	logger     log.Logger
 }
 
 // NewClient construct a mail gun notifier client
@@ -28,31 +34,42 @@ func NewClient(domain, privateKey, recipient, from string) *Client {
 		mg:         mailgun.NewMailgun(domain, privateKey),
 		recipient:  recipient,
 		from:       from,
+		logger:     log.NewNopLogger(),
 	}
 }
 
+func (mc *Client) SetLogger(logger log.Logger) {
+	mc.logger = logger
+}
+
 // Notify impl notifier's notify
-func (mc *Client) Notify(msg *types.Message) error {
+func (mc *Client) Notify(ctx context.Context, msg *types.Message) error {
 	var bf bytes.Buffer
 	err := msgTpl.Execute(&bf, msg)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "build template")
 	}
 	message := mc.mg.NewMessage(mc.from, msg.Title, msg.Content, mc.recipient)
 	message.SetHtml(bf.String())
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	ctx, cancel := context.WithTimeout(ctx, time.Second*10)
 	defer cancel()
 	resp, id, err := mc.mg.Send(ctx, message)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "send mail")
 	}
-	fmt.Printf("ID: %s Resp: %s\n", id, resp)
+	level.Info(mc.logger).Log("msg", fmt.Sprintf("ID: %s Resp: %s\n", id, resp))
 	return nil
 }
 
 func (mc *Client) GetName() string {
 	return "mail"
 }
+
+func (mc *Client) Close() error {
+	return nil
+}
+
+var _ types.Notifier = (*Client)(nil)
 
 var msgTpl = template.Must(template.New("mail").Parse(`
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional //EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd" />
