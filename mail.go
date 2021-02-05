@@ -15,6 +15,7 @@ type Mailer struct {
 	mg         mailgun.Mailgun
 	recipient  string
 	from       string
+	NoopCloser
 }
 
 func NewMailer(domain, privateKey, recipient, from string) *Mailer {
@@ -29,10 +30,6 @@ func NewMailer(domain, privateKey, recipient, from string) *Mailer {
 
 func (mc *Mailer) GetName() string {
 	return "mail"
-}
-
-func (mc *Mailer) Close() error {
-	return nil
 }
 
 func (mc *Mailer) Notify(ctx context.Context, to string, msg Message) error {
