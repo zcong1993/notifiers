@@ -9,6 +9,8 @@ import (
 	"github.com/pkg/errors"
 )
 
+const defaultTitle = "notifiers"
+
 type Mailer struct {
 	domain     string
 	privateKey string
@@ -43,7 +45,12 @@ func (mc *Mailer) Notify(ctx context.Context, to string, msg Message) error {
 		return errors.Wrap(err, "build template")
 	}
 
-	message := mc.mg.NewMessage(mc.from, "notifiers", msg.Content, to)
+	subject := defaultTitle
+	if msg.Title != "" {
+		subject = msg.Title
+	}
+
+	message := mc.mg.NewMessage(mc.from, subject, msg.Content, to)
 	message.SetHtml(bf.String())
 
 	_, _, err = mc.mg.Send(ctx, message)

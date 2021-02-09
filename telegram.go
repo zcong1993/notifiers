@@ -48,6 +48,7 @@ func (tg *Telegram) Notify(ctx context.Context, to string, msg Message) error {
 	}
 
 	tgMsg := tgbotapi.NewMessage(toId, msg.Content)
+	tgMsg.ParseMode = tgbotapi.ModeHTML
 
 	_, err := tg.tgClient.Send(tgMsg)
 	if err != nil {
