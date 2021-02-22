@@ -8,12 +8,14 @@ import (
 	"github.com/pkg/errors"
 )
 
+// Telegram impl notifier, notify msg by telegram bot.
 type Telegram struct {
 	token       string
 	tgClient    *tgbotapi.BotAPI
 	defaultToId int64
 }
 
+// NewTelegram create a instance.
 func NewTelegram(token string, defaultToId int64) (*Telegram, error) {
 	tgClient, err := tgbotapi.NewBotAPI(token)
 	if err != nil {
@@ -26,15 +28,20 @@ func NewTelegram(token string, defaultToId int64) (*Telegram, error) {
 	}, nil
 }
 
+// GetName impl Notifier.GetName.
 func (tg *Telegram) GetName() string {
 	return "telegram"
 }
 
+// Close impl Notifier.Close.
 func (tg *Telegram) Close() error {
 	tg.tgClient.StopReceivingUpdates()
 	return nil
 }
 
+// Notify impl Notifier.Notify.
+// If to is not set, will send msg to defaultToId.
+// The telegram message parse mode is html mode.
 func (tg *Telegram) Notify(ctx context.Context, to string, msg Message) error {
 	var toId int64
 	if to == "" {

@@ -11,6 +11,7 @@ import (
 
 const defaultTitle = "notifiers"
 
+// Mailer impl notifier, notify msg by mailgun API.
 type Mailer struct {
 	domain     string
 	privateKey string
@@ -20,6 +21,8 @@ type Mailer struct {
 	NoopCloser
 }
 
+// NewMailer create a instance.
+// The recipient is default receiver.
 func NewMailer(domain, privateKey, recipient, from string) *Mailer {
 	return &Mailer{
 		domain:     domain,
@@ -30,10 +33,14 @@ func NewMailer(domain, privateKey, recipient, from string) *Mailer {
 	}
 }
 
+// GetName impl Notifier.GetName.
 func (mc *Mailer) GetName() string {
 	return "mail"
 }
 
+// Notify impl Notifier.Notify.
+// If to is not set, will send msg to default recipient.
+// Content is html format.
 func (mc *Mailer) Notify(ctx context.Context, to string, msg Message) error {
 	if to == "" {
 		to = mc.recipient

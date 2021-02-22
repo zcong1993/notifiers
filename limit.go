@@ -6,6 +6,8 @@ import (
 	"time"
 )
 
+// Telegram impl notifier, can add a interval between messages.
+// Limiter run a background goroutine to handle message notify.
 type Limiter struct {
 	notifier Notifier
 	interval time.Duration
@@ -20,6 +22,7 @@ type msgWithTo struct {
 	msg Message
 }
 
+// NewCombine create a instance.
 func NewLimiter(notifier Notifier, interval time.Duration, msgChSize int) *Limiter {
 	l := &Limiter{
 		notifier: notifier,
@@ -34,10 +37,14 @@ func NewLimiter(notifier Notifier, interval time.Duration, msgChSize int) *Limit
 	return l
 }
 
+// GetName impl Notifier.GetName.
+// Name is "limiter " + inner notifier name.
 func (l *Limiter) GetName() string {
 	return "limiter " + l.notifier.GetName()
 }
 
+// Close impl Notifier.Close.
+// It will wait unfinished messages before close.
 func (l *Limiter) Close() error {
 	l.wg.Wait()
 	close(l.errCh)
@@ -45,6 +52,9 @@ func (l *Limiter) Close() error {
 	return l.notifier.Close()
 }
 
+// Notify impl Notifier.Notify.
+// This function is unblock, so return error always be nil.
+// If you need error message, see Limiter.GetErrorCh().
 func (l *Limiter) Notify(ctx context.Context, to string, msg Message) error {
 	l.wg.Add(1)
 	l.msgCh <- &msgWithTo{
@@ -54,6 +64,7 @@ func (l *Limiter) Notify(ctx context.Context, to string, msg Message) error {
 	return nil
 }
 
+// GetErrorCh return error message channel.
 func (l *Limiter) GetErrorCh() <-chan error {
 	return l.errCh
 }

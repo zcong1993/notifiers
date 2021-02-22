@@ -8,11 +8,13 @@ import (
 	"go.uber.org/multierr"
 )
 
+// Telegram impl notifier, can combine multi notifiers to one.
 type Combine struct {
 	name      string
 	notifiers []Notifier
 }
 
+// NewCombine create a instance from other notifiers.
 func NewCombine(notifiers ...Notifier) *Combine {
 	c := &Combine{notifiers: notifiers}
 	c.name = c.getName()
@@ -20,10 +22,14 @@ func NewCombine(notifiers ...Notifier) *Combine {
 	return c
 }
 
+// GetName impl Notifier.GetName.
+// Name is "combine " + inner notifier names.
 func (c *Combine) GetName() string {
 	return c.name
 }
 
+// Close impl Notifier.Close.
+// It return multierr, use multierr.Errors unwrap to multi errors slice.
 func (c *Combine) Close() error {
 	errs := make([]error, 0)
 	for _, n := range c.notifiers {
@@ -32,6 +38,8 @@ func (c *Combine) Close() error {
 	return multierr.Combine(errs...)
 }
 
+// Notify impl Notifier.Notify.
+// Call inner notifiers parallelly, and return a multierr, use multierr.Errors unwrap to multi errors slice.
 func (c *Combine) Notify(ctx context.Context, to string, msg Message) error {
 	var wg sync.WaitGroup
 	errs := make([]error, len(c.notifiers))

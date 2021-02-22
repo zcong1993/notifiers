@@ -14,6 +14,7 @@ import (
 	"github.com/pkg/errors"
 )
 
+// Ding impl notifier, notify msg by Dingding webhook.
 type Ding struct {
 	webhook    string
 	secret     string
@@ -21,6 +22,7 @@ type Ding struct {
 	NoopCloser
 }
 
+// TextMsg is dingding text message type.
 type TextMsg struct {
 	Msgtype string `json:"msgtype"`
 	Text    struct {
@@ -28,11 +30,13 @@ type TextMsg struct {
 	} `json:"text"`
 }
 
+// Resp is dingding api response.
 type Resp struct {
 	Errcode int64  `json:"errcode"`
 	Errmsg  string `json:"errmsg"`
 }
 
+// NewDing create a instance.
 func NewDing(webhook string, secret string) *Ding {
 	return &Ding{
 		webhook:    webhook,
@@ -41,10 +45,12 @@ func NewDing(webhook string, secret string) *Ding {
 	}
 }
 
+// GetName impl Notifier.GetName.
 func (d *Ding) GetName() string {
 	return "dingding"
 }
 
+// Notify impl Notifier.Notify.
 func (d *Ding) Notify(ctx context.Context, to string, msg Message) error {
 	textMsg := &TextMsg{
 		Msgtype: "text",

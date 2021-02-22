@@ -6,16 +6,23 @@ import (
 	"github.com/pkg/errors"
 )
 
+// ErrNotify is notify error.
 var ErrNotify = errors.New("notify error")
 
+// Notifier is Notify interface.
 type Notifier interface {
+	// GetName return notifier type name
 	GetName() string
+	// Notify notify msg
 	Notify(ctx context.Context, to string, msg Message) error
+	// Close close notifier
 	Close() error
 }
 
+// NoopCloser impl a noop io.Closer.
 type NoopCloser struct{}
 
+// Close impl io.Closer.
 func (nc *NoopCloser) Close() error {
 	return nil
 }
