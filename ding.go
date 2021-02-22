@@ -65,7 +65,7 @@ func (d *Ding) Notify(ctx context.Context, to string, msg Message) error {
 		return errors.Wrap(err, "create request")
 	}
 	req.Header.Add("Content-Type", "application/json")
-	req.WithContext(ctx)
+	req = req.WithContext(ctx)
 
 	r, err := d.httpclient.Do(req)
 	if err != nil {
@@ -98,7 +98,7 @@ func (d *Ding) getSignQuery(now time.Time) string {
 func (d *Ding) getSign(ts int64) string {
 	signStr := fmt.Sprintf("%d\n%s", ts, d.secret)
 	h := hmac.New(sha256.New, []byte(d.secret))
-	h.Write([]byte(signStr))
+	_, _ = h.Write([]byte(signStr))
 	res := h.Sum(nil)
 	return base64.StdEncoding.EncodeToString(res)
 }
