@@ -22,7 +22,7 @@ type msgWithTo struct {
 	msg Message
 }
 
-// NewCombine create a instance.
+// NewLimiter create a instance.
 func NewLimiter(notifier Notifier, interval time.Duration, msgChSize int) *Limiter {
 	l := &Limiter{
 		notifier: notifier,
