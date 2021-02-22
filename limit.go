@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-// Telegram impl notifier, can add a interval between messages.
+// Limiter impl notifier, can add a interval between messages.
 // Limiter run a background goroutine to handle message notify.
 type Limiter struct {
 	notifier Notifier

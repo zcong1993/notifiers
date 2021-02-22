@@ -8,7 +8,7 @@ import (
 	"go.uber.org/multierr"
 )
 
-// Telegram impl notifier, can combine multi notifiers to one.
+// Combine impl notifier, can combine multi notifiers to one.
 type Combine struct {
 	name      string
 	notifiers []Notifier
