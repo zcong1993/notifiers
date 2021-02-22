@@ -53,7 +53,7 @@ func TestLimiter(t *testing.T) {
 }
 
 func TestLimiter_Error(t *testing.T) {
-	l := NewLimiter(&errNotifier{}, time.Millisecond*20, 10)
+	l := NewLimiter(&errNotifier{}, time.Millisecond*50, 10)
 
 	i := 0
 
@@ -68,6 +68,6 @@ func TestLimiter_Error(t *testing.T) {
 		}
 	}()
 
-	time.Sleep(time.Second * 2)
+	//time.Sleep(time.Second * 2)
 	l.Close()
 }

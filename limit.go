@@ -2,6 +2,7 @@ package notifiers
 
 import (
 	"context"
+	"sync"
 	"time"
 )
 
@@ -11,6 +12,7 @@ type Limiter struct {
 	done     chan struct{}
 	msgCh    chan *msgWithTo
 	errCh    chan error
+	wg       sync.WaitGroup
 }
 
 type msgWithTo struct {
@@ -37,12 +39,14 @@ func (l *Limiter) GetName() string {
 }
 
 func (l *Limiter) Close() error {
+	l.wg.Wait()
 	close(l.errCh)
 	close(l.done)
 	return l.notifier.Close()
 }
 
 func (l *Limiter) Notify(ctx context.Context, to string, msg Message) error {
+	l.wg.Add(1)
 	l.msgCh <- &msgWithTo{
 		to:  to,
 		msg: msg,
@@ -61,6 +65,7 @@ func (l *Limiter) run() {
 			return
 		case msg := <-l.msgCh:
 			err := l.notifier.Notify(context.Background(), msg.to, msg.msg)
+			l.wg.Done()
 			if err != nil {
 				select {
 				case l.errCh <- err:
