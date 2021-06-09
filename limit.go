@@ -57,6 +57,7 @@ func (l *Limiter) Close() error {
 	return l.notifier.Close()
 }
 
+// Wait impl Notifier.Wait.
 func (l *Limiter) Wait() {
 	l.wg.Wait()
 }

@@ -38,7 +38,7 @@ func (c *Combine) Close() error {
 	return multierr.Combine(errs...)
 }
 
-// Wait impl Notifier.Wait
+// Wait impl Notifier.Wait.
 func (c *Combine) Wait() {
 	var wg sync.WaitGroup
 	for _, n := range c.notifiers {

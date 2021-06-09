@@ -28,8 +28,8 @@ func (nc *NoopCloser) Close() error {
 	return nil
 }
 
-// NoopWaiter impl a noop Waiter
+// NoopWaiter impl a noop Waiter.
 type NoopWaiter struct{}
 
-// Wait imple wait
+// Wait imple wait.
 func (nw *NoopWaiter) Wait() {}
