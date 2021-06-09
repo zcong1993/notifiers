@@ -4,6 +4,8 @@ import (
 	"context"
 	"sync"
 	"time"
+
+	"github.com/pkg/errors"
 )
 
 // Limiter impl notifier, can add a interval between messages.
@@ -11,7 +13,8 @@ import (
 type Limiter struct {
 	notifier Notifier
 	interval time.Duration
-	done     chan struct{}
+	ctx      context.Context
+	cancel   func()
 	msgCh    chan *msgWithTo
 	errCh    chan error
 	wg       sync.WaitGroup
@@ -27,10 +30,11 @@ func NewLimiter(notifier Notifier, interval time.Duration, msgChSize int) *Limit
 	l := &Limiter{
 		notifier: notifier,
 		interval: interval,
-		done:     make(chan struct{}),
 		msgCh:    make(chan *msgWithTo, msgChSize),
 		errCh:    make(chan error, 10),
 	}
+
+	l.ctx, l.cancel = context.WithCancel(context.Background())
 
 	go l.run()
 
@@ -46,10 +50,8 @@ func (l *Limiter) GetName() string {
 // Close impl Notifier.Close.
 // It will wait unfinished messages before close.
 func (l *Limiter) Close() error {
-	close(l.msgCh)
-	l.wg.Wait()
 	close(l.errCh)
-	close(l.done)
+	l.cancel()
 	return l.notifier.Close()
 }
 
@@ -57,11 +59,16 @@ func (l *Limiter) Close() error {
 // This function is unblock, so return error always be nil.
 // If you need error message, see Limiter.GetErrorCh().
 func (l *Limiter) Notify(ctx context.Context, to string, msg Message) error {
+	if l.ctx.Err() != nil {
+		return errors.New("limiter closed")
+	}
+
 	l.msgCh <- &msgWithTo{
 		to:  to,
 		msg: msg,
 	}
 	l.wg.Add(1)
+
 	return nil
 }
 
@@ -73,7 +80,8 @@ func (l *Limiter) GetErrorCh() <-chan error {
 func (l *Limiter) run() {
 	for {
 		select {
-		case <-l.done:
+		case <-l.ctx.Done():
+			l.wg.Wait()
 			return
 		case msg := <-l.msgCh:
 			err := l.notifier.Notify(context.Background(), msg.to, msg.msg)
