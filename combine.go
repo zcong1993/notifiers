@@ -38,6 +38,20 @@ func (c *Combine) Close() error {
 	return multierr.Combine(errs...)
 }
 
+// Wait impl Notifier.Wait
+func (c *Combine) Wait() {
+	var wg sync.WaitGroup
+	for _, n := range c.notifiers {
+		wg.Add(1)
+		n := n
+		go func() {
+			n.Wait()
+			wg.Done()
+		}()
+	}
+	wg.Wait()
+}
+
 // Notify impl Notifier.Notify.
 // Call inner notifiers parallelly, and return a multierr, use multierr.Errors unwrap to multi errors slice.
 func (c *Combine) Notify(ctx context.Context, to string, msg Message) error {
@@ -69,3 +83,5 @@ func (c *Combine) getName() string {
 	}
 	return sb.String()
 }
+
+var _ Notifier = (*Combine)(nil)

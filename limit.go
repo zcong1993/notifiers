@@ -51,10 +51,14 @@ func (l *Limiter) GetName() string {
 // It will wait unfinished messages before close.
 func (l *Limiter) Close() error {
 	atomic.StoreInt32(&l.closed, 1)
-	l.wg.Wait()
+	l.Wait()
 	close(l.doneCh)
 	close(l.errCh)
 	return l.notifier.Close()
+}
+
+func (l *Limiter) Wait() {
+	l.wg.Wait()
 }
 
 // Notify impl Notifier.Notify.
@@ -98,3 +102,5 @@ func (l *Limiter) run() {
 		}
 	}
 }
+
+var _ Notifier = (*Limiter)(nil)

@@ -17,6 +17,7 @@ type Notifier interface {
 	Notify(ctx context.Context, to string, msg Message) error
 	// Close close notifier
 	Close() error
+	Wait()
 }
 
 // NoopCloser impl a noop io.Closer.
@@ -26,3 +27,9 @@ type NoopCloser struct{}
 func (nc *NoopCloser) Close() error {
 	return nil
 }
+
+// NoopWaiter impl a noop Waiter
+type NoopWaiter struct{}
+
+// Wait imple wait
+func (nw *NoopWaiter) Wait() {}

@@ -19,6 +19,7 @@ type Mailer struct {
 	recipient  string
 	from       string
 	NoopCloser
+	NoopWaiter
 }
 
 // NewMailer create a instance.
@@ -359,3 +360,5 @@ var tplTxt = `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional //EN" "h
     <div style="display:none; white-space:nowrap; font-size:15px; line-height:0;">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </div>
   </body>
 </html>`
+
+var _ Notifier = (*Mailer)(nil)

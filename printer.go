@@ -8,6 +8,7 @@ import (
 
 // Printer impl notifier, notify msg to a io.Writer.
 type Printer struct {
+	NoopWaiter
 	writer io.Writer
 }
 
@@ -36,3 +37,5 @@ func (p *Printer) Notify(ctx context.Context, to string, msg Message) error {
 	_, err = p.writer.Write(b)
 	return err
 }
+
+var _ Notifier = (*Printer)(nil)

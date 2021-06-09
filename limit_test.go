@@ -22,6 +22,7 @@ func (ww *w) Write(p []byte) (n int, err error) {
 }
 
 type errNotifier struct {
+	NoopWaiter
 }
 
 func (e *errNotifier) GetName() string {

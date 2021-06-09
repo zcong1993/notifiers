@@ -20,6 +20,7 @@ type Ding struct {
 	secret     string
 	httpclient *http.Client
 	NoopCloser
+	NoopWaiter
 }
 
 // TextMsg is dingding text message type.
@@ -108,3 +109,5 @@ func (d *Ding) getSign(ts int64) string {
 	res := h.Sum(nil)
 	return base64.StdEncoding.EncodeToString(res)
 }
+
+var _ Notifier = (*Ding)(nil)

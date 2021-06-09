@@ -15,6 +15,7 @@ type Telegram struct {
 	token       string
 	tgClient    *tgbotapi.BotAPI
 	defaultToId int64
+	NoopWaiter
 }
 
 // NewTelegram create a instance.
@@ -65,3 +66,5 @@ func (tg *Telegram) Notify(ctx context.Context, to string, msg Message) error {
 	}
 	return nil
 }
+
+var _ Notifier = (*Telegram)(nil)
