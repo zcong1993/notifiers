@@ -23,9 +23,6 @@ func (p *Printer) GetName() string {
 
 // Close impl Notifier.Close.
 func (p *Printer) Close() error {
-	if closer, ok := p.writer.(io.Closer); ok {
-		return closer.Close()
-	}
 	return nil
 }
 
