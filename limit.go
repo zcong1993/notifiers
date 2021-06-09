@@ -46,6 +46,7 @@ func (l *Limiter) GetName() string {
 // Close impl Notifier.Close.
 // It will wait unfinished messages before close.
 func (l *Limiter) Close() error {
+	close(l.msgCh)
 	l.wg.Wait()
 	close(l.errCh)
 	close(l.done)
@@ -56,11 +57,11 @@ func (l *Limiter) Close() error {
 // This function is unblock, so return error always be nil.
 // If you need error message, see Limiter.GetErrorCh().
 func (l *Limiter) Notify(ctx context.Context, to string, msg Message) error {
-	l.wg.Add(1)
 	l.msgCh <- &msgWithTo{
 		to:  to,
 		msg: msg,
 	}
+	l.wg.Add(1)
 	return nil
 }
 

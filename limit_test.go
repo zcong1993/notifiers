@@ -3,6 +3,7 @@ package notifiers
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"testing"
 	"time"
 
@@ -69,5 +70,13 @@ func TestLimiter_Error(t *testing.T) {
 	}()
 
 	//time.Sleep(time.Second * 2)
+	l.Close()
+}
+
+func TestLimiter_Wait(t *testing.T) {
+	l := NewLimiter(NewPrinter(&w{bt: &bytes.Buffer{}, t: t}), time.Millisecond*200, 10)
+	for i := 0; i < 100; i++ {
+		l.Notify(context.Background(), "", MessageFromContent(fmt.Sprintf("test-%d", i)))
+	}
 	l.Close()
 }
