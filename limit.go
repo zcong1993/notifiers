@@ -3,6 +3,7 @@ package notifiers
 import (
 	"context"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/pkg/errors"
@@ -13,8 +14,8 @@ import (
 type Limiter struct {
 	notifier Notifier
 	interval time.Duration
-	ctx      context.Context
-	cancel   func()
+	doneCh chan struct{}
+	closed int32
 	msgCh    chan *msgWithTo
 	errCh    chan error
 	wg       sync.WaitGroup
@@ -30,11 +31,10 @@ func NewLimiter(notifier Notifier, interval time.Duration, msgChSize int) *Limit
 	l := &Limiter{
 		notifier: notifier,
 		interval: interval,
+		doneCh: make(chan struct{}),
 		msgCh:    make(chan *msgWithTo, msgChSize),
 		errCh:    make(chan error, 10),
 	}
-
-	l.ctx, l.cancel = context.WithCancel(context.Background())
 
 	go l.run()
 
@@ -50,8 +50,10 @@ func (l *Limiter) GetName() string {
 // Close impl Notifier.Close.
 // It will wait unfinished messages before close.
 func (l *Limiter) Close() error {
+	atomic.StoreInt32(&l.closed, 1)
+	l.wg.Wait()
+	close(l.doneCh)
 	close(l.errCh)
-	l.cancel()
 	return l.notifier.Close()
 }
 
@@ -59,7 +61,7 @@ func (l *Limiter) Close() error {
 // This function is unblock, so return error always be nil.
 // If you need error message, see Limiter.GetErrorCh().
 func (l *Limiter) Notify(ctx context.Context, to string, msg Message) error {
-	if l.ctx.Err() != nil {
+	if atomic.LoadInt32(&l.closed) == 1 {
 		return errors.New("limiter closed")
 	}
 
@@ -80,8 +82,7 @@ func (l *Limiter) GetErrorCh() <-chan error {
 func (l *Limiter) run() {
 	for {
 		select {
-		case <-l.ctx.Done():
-			l.wg.Wait()
+		case <-l.doneCh:
 			return
 		case msg := <-l.msgCh:
 			err := l.notifier.Notify(context.Background(), msg.to, msg.msg)
