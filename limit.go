@@ -14,8 +14,8 @@ import (
 type Limiter struct {
 	notifier Notifier
 	interval time.Duration
-	doneCh chan struct{}
-	closed int32
+	doneCh   chan struct{}
+	closed   int32
 	msgCh    chan *msgWithTo
 	errCh    chan error
 	wg       sync.WaitGroup
@@ -31,7 +31,7 @@ func NewLimiter(notifier Notifier, interval time.Duration, msgChSize int) *Limit
 	l := &Limiter{
 		notifier: notifier,
 		interval: interval,
-		doneCh: make(chan struct{}),
+		doneCh:   make(chan struct{}),
 		msgCh:    make(chan *msgWithTo, msgChSize),
 		errCh:    make(chan error, 10),
 	}
