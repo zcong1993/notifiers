@@ -4,8 +4,6 @@ import (
 	"context"
 	"strconv"
 
-	"github.com/k3a/html2text"
-
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	"github.com/pkg/errors"
 )
@@ -57,8 +55,8 @@ func (tg *Telegram) Notify(ctx context.Context, to string, msg Message) error {
 		toId = to
 	}
 
-	tgMsg := tgbotapi.NewMessage(toId, html2text.HTML2Text(msg.Content))
-	//tgMsg.ParseMode = tgbotapi.ModeHTML
+	tgMsg := tgbotapi.NewMessage(toId, msg.Content)
+	tgMsg.ParseMode = tgbotapi.ModeHTML
 
 	_, err := tg.tgClient.Send(tgMsg)
 	if err != nil {
